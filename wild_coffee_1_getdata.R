@@ -7,32 +7,38 @@ if (this == "LAPTOP-IVSPBGCA") {
 }
 
 dir.create("data", FALSE, FALSE)
-
 library(geodata)
-fgbif <- "data/gbif_arabica.rds"
-if (!file.exists(fgbif)) {
-	arabica <- sp_occurrence("Coffea","arabica", geo=FALSE)
-	saveRDS(arabica, fgbif)
-} else {
-	arabica <- readRDS(fgbif)
+
+spp <- c("arabica", "canephora", "eugenioides")
+for (sp in spp) {
+	print(sp)
+	fname <- paste0("data/gbif_", sp, "_1.rds")
+	if (!file.exists(fname)) {
+		d <- sp_occurrence("Coffea", sp, geo=FALSE)
+		saveRDS(d, fname)
+	} else {
+		d <- readRDS(fname)
+	}
+	fname2 <- paste0("data/gbif_", sp, "_2.rds")
+	if (!file.exists(fname2)) {
+		i <- duplicated(d[, c('lon', 'lat')]) 
+		d <- d[!i, ]
+		d <- subset(d, !is.na(lon) & !is.na(lat))
+		d <- d[d$lon > -20 & d$lat > -20, ]
+		d <- d[d$lon < 40 & d$lat < 40, ]
+		saveRDS(d, fname2)
+	}
 }
 
-dups2 <- duplicated(arabica[, c('lon', 'lat')]) 
-arabica <- arabica[!dups2, ] #remove duplicate occurrences
-arabica <- subset(arabica, !is.na(lon) & !is.na(lat))
-arabica <- arabica[arabica$lon > -20  & arabica$lat > -20, ]
-ar <- arabica[arabica$lon < 40  & arabica$lat < 40, ]
-dim(ar)
 
 w <- geodata::world(path="data")
 plot(w)
-
-points(ar$lon, ar$lat, col='orange', pch=20, cex=0.75)
+points(d$lon, d$lat, col='orange', pch=20, cex=0.75)
 # plot points again to add a border, for better visibility
-points(ar$lon, ar$lat, col='red', cex=0.75)
+points(d$lon, d$lat, col='red', cex=0.75)
 
 # points that are in the ocean
-v <- vect(ar, c("lon", "lat"))
+v <- vect(d, c("lon", "lat"))
 e <- extract(w, v)
 i <- which(is.na(e$GID_0))
 fix <- values(v[i, ])
@@ -58,4 +64,5 @@ fix[,"cloc"]
 
 # import clean arabica dataset
 #wild_arabica <- read_excel("Desktop/coffee coordinates.xlsx", sheet = "Arabica_clean")
+
 
