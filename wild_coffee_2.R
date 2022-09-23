@@ -5,10 +5,14 @@ if (this == "LAPTOP-IVSPBGCA") {
 	setwd("")
 }
 
+dir.create("climate", FALSE, FALSE)
+dir.create("output", FALSE, FALSE)
+
 library(dismo)
 
-current_climate <- getData('worldclim', var='bio', res=2.5)
-future_climate <- getData('CMIP5', var='bio', res=2.5, rcp=85, model='AC', year=70) # How to chose the best model?
+
+current_climate <- getData('worldclim', var='bio', res=2.5, path="climate")
+future_climate <- getData('CMIP5', var='bio', res=2.5, rcp=85, model='AC', year=70, path="climate") # How to chose the best model?
 
 names(future_climate) <- names(current_climate)
 ext <- extent(-15, 56, -35, 36)
