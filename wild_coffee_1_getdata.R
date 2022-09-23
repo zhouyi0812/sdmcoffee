@@ -31,18 +31,31 @@ points(ar$lon, ar$lat, col='orange', pch=20, cex=0.75)
 # plot points again to add a border, for better visibility
 points(ar$lon, ar$lat, col='red', cex=0.75)
 
-View(ar)
-colnames(ar)
-arabica_not_clean <- ar[c("acceptedScientificName","lat","lon","basisOfRecord","year","country","cloc","collectionCode","datasetName")]
+# points that are in the ocean
+v <- vect(ar, c("lon", "lat"))
+e <- extract(w, v)
+i <- which(is.na(e$GID_0))
+fix <- values(v[i, ])
+
+fix[,"cloc"]
+#[1] "São Tomé and Príncipe"                                              
+#[2] "Faz. Curralinho, margem esquerda do rio Corumbá., Brazil"           
+#[3] "Barra do rio Santo Antônio, próximo á futura balsa., Brazil"        
+#[4] "Fazenda Sucupira. Mata de galeria (córrego do Açudinho II)., Brazil"
+#[5] "Aburi, Ghana"                                                       
+#[6] "Legon, Ghana"                                                       
+#[7] "Gran Canaria, Bañaderos, Spain"                                     
+ 
+
+## better to fix than to remove... 
+##v <- v[-i,]
+##ar <- ar[-i, ]
+
+#arabica_not_clean <- ar[c("acceptedScientificName","lat","lon","basisOfRecord","year","country","cloc","collectionCode","datasetName")]
 
 # Write csv and maually check the coordinates, remove something in the sea and cultivated
-write.csv(arabica_not_clean,"arabica_not_clean.csv")
+#write.csv(arabica_not_clean,"arabica_not_clean.csv")
 
 # import clean arabica dataset
-wild_arabica <- read_excel("Desktop/coffee coordinates.xlsx", sheet = "Arabica_clean")
-
-# plot clean Arabic 
-plot(wrld_simpl, xlim=c(-20,40), ylim=c(-40,40), axes=TRUE, col="light yellow") 
-box()
-points(wild_arabica$lon, wild_arabica$lat, col='red', cex=0.15)
+#wild_arabica <- read_excel("Desktop/coffee coordinates.xlsx", sheet = "Arabica_clean")
 
