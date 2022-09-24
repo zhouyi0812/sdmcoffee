@@ -31,14 +31,18 @@ for (sp in spp) {
 }
 
 
+sp <- "arabica"
+f <- paste0("data/gbif_", sp, "_2.rds")
+d <- readRDS(f)
+v <- vect(d, c("lon", "lat"))
+
 w <- geodata::world(path="data")
 plot(w)
-points(d$lon, d$lat, col='orange', pch=20, cex=0.75)
+points(v, col='orange', pch=20, cex=0.75)
 # plot points again to add a border, for better visibility
-points(d$lon, d$lat, col='red', cex=0.75)
+points(v, col='red', cex=0.75, pch=1)
 
 # points that are in the ocean
-v <- vect(d, c("lon", "lat"))
 e <- extract(w, v)
 i <- which(is.na(e$GID_0))
 fix <- values(v[i, ])
